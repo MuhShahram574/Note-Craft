@@ -15,6 +15,20 @@ module.exports = {
       minHeight: {
         "custom-full": "89vh",
       },
+      maxHeight: {
+        "custom-full": "89vh",
+      },
+      keyframes: {
+        fadeIn: {
+          from: {
+            opacity: "0",
+            transform: "translateY(5px)",
+          },
+        },
+      },
+      animation: {
+        fadeIn: "fadeIn linear 0.5s",
+      },
     },
   },
   plugins: [],
