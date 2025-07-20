@@ -13,7 +13,9 @@
       rel="stylesheet"
     />
   </head>
-  <body class="font-roboto min-h-screen selection:text-gray-100 selection:bg-violet-800">
+  <body
+    class="font-roboto min-h-screen selection:text-gray-100 selection:bg-violet-800 relative"
+  >
     <header
       class="grid grid-cols-1 md:grid-cols-5 justify-between items-center py-2 px-2 sm:px-4 md:py-4 md:px-7 border-b border-violet-500/20"
     >
@@ -276,5 +278,65 @@
         </div>
       </section>
     </main>
+    <!-- Add Note Section -->
+    <section>
+      <div
+        id="add-notes-section"
+        class="min-h-screen min-w-full bg-white absolute top-0 flex justify-center items-center"
+      >
+        <div class="p-7 flex flex-col gap-12 rounded-2xl shadow-custom-Black">
+          <form action="" class="flex flex-col gap-5">
+            <input
+              type="text"
+              class="px-4 py-2 rounded-xl text-lg outline-none shadow-custom-Black"
+              placeholder="Note Title"
+            />
+            <textarea
+              name="discription"
+              id="discription"
+              class="px-4 py-2 rounded-xl text-lg outline-none shadow-custom-Black"
+              cols="50"
+              rows="7"
+              placeholder="Discription"
+            ></textarea>
+            <div class="radio-btn-box flex gap-4">
+              <div class="flex gap-1">
+                <div
+                  class="radio-btn cursor-pointer h-6 w-6 border-4 border-purple-400 rounded-full"
+                ></div>
+                <p>Purple</p>
+              </div>
+              <div class="flex gap-1">
+                <div
+                  class="radio-btn cursor-pointer h-6 w-6 border-4 border-yellow-400 rounded-full"
+                ></div>
+                <p>Yellow</p>
+              </div>
+              <div class="flex gap-1">
+                <div
+                  class="radio-btn cursor-pointer h-6 w-6 border-4 border-green-400 rounded-full"
+                ></div>
+                <p>Green</p>
+              </div>
+            </div>
+          </form>
+          <div class="flex gap-3 justify-end">
+            <input
+              id="add-notes-btn add-notes-cancel-btn"
+              type="button"
+              value="Cancel"
+              class="px-5 py-1.5 rounded-3xl shadow-custom-Black cursor-pointer transition-all duration-100 -translate-y-1 active:translate-y-0 active:shadow-md"
+            />
+            <input
+              id=" add-notes-btn add-notes-save-btn"
+              type="button"
+              value="Save"
+              class="px-5 py-1.5 text-gray-100 shadow-custom-Black rounded-3xl bg-purple-700 cursor-pointer transition-all duration-100 -translate-y-1 active:translate-y-0 active:shadow-md"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
   </body>
+  <script src="script.js"></script>
 </html>
