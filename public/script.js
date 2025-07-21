@@ -5,7 +5,6 @@
 // Sections
 const addNotesSec = document.getElementById("add-notes-section");
 const notesContainer = document.getElementById("notes-container");
-// console.log((notesContainer.innerHTML = ""));
 
 //  Elements
 const newNoteBtn = document.getElementById("new-note");
@@ -21,7 +20,6 @@ const radioBtns = [...document.querySelectorAll(".radio-btn")]; // NodeList
 const addNotesCancelBtn = document.getElementById("add-notes-cancel-btn");
 const addNotesSaveBtn = document.getElementById("add-notes-save-btn");
 // Date Entered by User
-const tasks = [];
 
 // ------------------- //
 // ADD A NEW NOTE...
@@ -48,13 +46,38 @@ const removeClass = (btn) => {
 };
 
 const showMsg = function (color, msg) {
-  alertBox.classList.add(`border-${color}-600`);
   alertBox.classList.remove("hidden");
   alertMsg.textContent = msg;
   setTimeout(() => {
-    alertBox.classList.remove(`border-${color}-600`);
     alertBox.classList.add("hidden");
   }, 5000);
+};
+
+// CREATING DATES AND TIMES WITH ISO...
+const currentDate = function (need, ISO = Date.now()) {
+  const isoDate = new Date(ISO);
+  if (need === "date") {
+    return isoDate.toLocaleDateString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  } else if (need === "time") {
+    return isoDate.toLocaleTimeString("default", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h24",
+    });
+  } else {
+    return isoDate.toLocaleString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h24",
+    });
+  }
 };
 
 // Handlers
@@ -91,8 +114,27 @@ const noteFormAppear = function () {
     newNoteCancel();
   });
 };
+// SETTING DATA TO LOCAL STORAGE...
 
-const addData = function (tasks) {
+if (!localStorage.getItem("taskN0")) {
+  localStorage.setItem("taskN0", 1);
+}
+let taskN0 = +localStorage.getItem("taskN0");
+console.log(taskN0);
+
+// Creating Tasks array
+let tasks;
+const setTasks = function () {
+  tasks = [];
+  for (let index = 1; index <= taskN0; index++) {
+    if (localStorage.getItem(`task${index}`)) {
+      let task = JSON.parse(localStorage.getItem(`task${index}`));
+      tasks.push(task);
+    }
+  }
+};
+
+const setLocalStorage = function () {
   addNotesSaveBtn.addEventListener("click", () => {
     const title = newNoteTitle.value;
     const description = newNoteDiscription.value;
@@ -106,18 +148,49 @@ const addData = function (tasks) {
     } else {
       const bgColor =
         checkedRadioBtn(radioBtns).nextElementSibling.textContent.toLowerCase();
-      tasks.push({
-        title: title,
-        description: description,
-        bgColor: bgColor,
-      });
+      localStorage.setItem(
+        `task${taskN0}`,
+        JSON.stringify({
+          title: title,
+          description: description,
+          bgColor: bgColor,
+        })
+      );
       newNoteCancel();
       showMsg("green", "Note Created");
+      taskN0++
+      localStorage.setItem("taskN0", taskN0);
+      setTasks();
+
+      if (tasks.length !== 0) {
+        createNewNote(tasks);
+      }
     }
+    console.log(taskN0);
   });
 };
 
+function createNewNote(tasks) {
+  console.log(tasks);
+
+  notesContainer.innerHTML = "";
+  tasks.forEach((task) => {
+    const html = `
+    <div
+    class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
+    >
+    <p class="text-sm text-gray-600">${currentDate("date")}</p>
+    <h3 class="text-2xl font-medium">${task.title}</h3>
+    <p class="text-lg line-clamp-6">${task.description}</p>
+    </div>
+    `;
+    notesContainer.insertAdjacentHTML("beforeend", html);
+  });
+}
+
 // Calling Functions
-addData(tasks);
+setTasks();
+setLocalStorage();
+createNewNote(tasks);
 noteFormAppear();
 radioBtn();
