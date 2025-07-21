@@ -25,9 +25,29 @@ module.exports = {
             transform: "translateY(5px)",
           },
         },
+        showmsg: {
+          "0%": {
+            opacity: "0",
+            transform: 'translateX("10px")',
+          },
+
+          "20%": {
+            opacity: "1",
+            transform: 'translateX("0px")',
+          },
+          "80%": {
+            opacity: "0",
+            transform: 'translateX("10px")',
+          },
+          "100%": {
+            opacity: "0",
+            visibility: "hidden",
+          },
+        },
       },
       animation: {
         fadeIn: "fadeIn linear 0.5s",
+        showMsg: "showmsg 5s ease-in-out forwards",
       },
     },
   },
