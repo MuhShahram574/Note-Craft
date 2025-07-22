@@ -80,14 +80,22 @@ const currentDate = function (need, ISO = Date.now()) {
   }
 };
 
-// Handlers
-
 function newNoteCancel() {
   addNotesSec.classList.add("hidden");
   addNotesSec.classList.remove("flex");
   radioBtns.forEach((btn) => removeClass(btn));
   clearFields(newNoteTitle, newNoteDiscription);
 }
+
+const noteFormAppear = function () {
+  newNoteBtn.addEventListener("click", () => {
+    addNotesSec.classList.remove("hidden");
+    addNotesSec.classList.add("flex");
+  });
+  addNotesCancelBtn.addEventListener("click", () => {
+    newNoteCancel();
+  });
+};
 
 // functionality of Radio btns
 function radioBtn() {
@@ -104,22 +112,14 @@ function radioBtn() {
     });
   });
 }
-// Show or Hide Form
-const noteFormAppear = function () {
-  newNoteBtn.addEventListener("click", () => {
-    addNotesSec.classList.remove("hidden");
-    addNotesSec.classList.add("flex");
-  });
-  addNotesCancelBtn.addEventListener("click", () => {
-    newNoteCancel();
-  });
-};
-// SETTING DATA TO LOCAL STORAGE...
 
+// SETTING DATA TO LOCAL STORAGE...
 if (!localStorage.getItem("taskN0")) {
   localStorage.setItem("taskN0", 1);
 }
 let taskN0 = +localStorage.getItem("taskN0");
+
+// Updating Tasks Array...
 const setTasks = function () {
   let tasks = [];
   for (let index = 1; index <= taskN0; index++) {
@@ -131,17 +131,24 @@ const setTasks = function () {
   }
   return tasks;
 };
+// Creating the main task array...
+let tasks = setTasks();
 
-const tasks = setTasks();
+// Crating a new note...
 function createNewNote(tasks) {
   notesContainer.innerHTML = "";
   tasks.forEach((task) => {
     const bgColor = `bg-${task.bgColor}-500`;
     const html = `
     <div
-    class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-3 ${bgColor}"
+    class="shadow-custom-Black w-full break-inside-avoid rounded-lg p-5 flex flex-col justify-start gap-3 ${bgColor} relative group"
     >
-    <div class="flex flex-col gap-1">
+ <div class="flex justify-center items-center bg-gray-900 w-fit py-1 px-1.5 rounded-full transition-all duration-75 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute -right-1 -top-1 opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="15" viewBox="0 0 384 512">
+        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
+     </div>
+    
+    <div class="flex flex-col justify-between gap-1">
     <p class="text-sm text-gray-700">${currentDate("date")}</p>
     <h3 class="text-2xl font-medium">${task.title}</h3>
     </div>
@@ -152,7 +159,11 @@ function createNewNote(tasks) {
     notesContainer.insertAdjacentHTML("beforeend", html);
   });
 }
-
+const uiUpdate = function () {
+  setTasks();
+  createNewNote(tasks);
+};
+// Setting the localStorage
 const setLocalStorage = function () {
   addNotesSaveBtn.addEventListener("click", () => {
     const title = newNoteTitle.value;
@@ -181,18 +192,14 @@ const setLocalStorage = function () {
       localStorage.setItem("taskN0", taskN0);
       newNoteCancel();
       showMsg("green", "Note Created");
-
-      const updatedTasks = setTasks();
-      if (updatedTasks.length !== 0) {
-        createNewNote(updatedTasks);
-      }
+      tasks = setTasks();
+      uiUpdate();
     }
   });
 };
 
 // Calling Functions
-setTasks();
-setLocalStorage();
-createNewNote(tasks);
 noteFormAppear();
 radioBtn();
+uiUpdate(addNotesSaveBtn);
+setLocalStorage();

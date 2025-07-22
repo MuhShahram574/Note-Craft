@@ -16,9 +16,7 @@
   <body
     class="font-roboto h-screen selection:text-gray-100 selection:bg-violet-800 relative"
   >
-   <div class="features">
-    
-   </div>
+    <div class="features"></div>
     <div
       class="alert bg-gray-100 py-3 px-6 fixed bottom-5 right-5 z-50 rounded-md opacity-0 shadow-custom-Black hidden animate-showMsg"
     >
@@ -82,7 +80,7 @@
               />
             </svg>
             <div
-              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-500 text-white font-semibold group-hover:animate-fadeIn hidden"
+              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-700/70 backdrop-blur shadow-custom-Black text-white font-semibold group-hover:animate-fadeIn hidden z-50"
             >
               <p>Your Notes</p>
             </div>
@@ -102,7 +100,7 @@
               />
             </svg>
             <div
-              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-500 text-white font-semibold group-hover:animate-fadeIn hidden"
+              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-700/70 backdrop-blur shadow-custom-Black text-white font-semibold group-hover:animate-fadeIn hidden z-50"
             >
               <p>New Note</p>
             </div>
@@ -121,7 +119,7 @@
               />
             </svg>
             <div
-              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-36 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-500 text-white font-semibold group-hover:animate-fadeIn hidden"
+              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-36 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-700/70 backdrop-blur shadow-custom-Black text-white font-semibold group-hover:animate-fadeIn hidden z-50"
             >
               Achieved Notes
             </div>
@@ -140,7 +138,7 @@
               />
             </svg>
             <div
-              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-500 text-white font-semibold group-hover:animate-fadeIn hidden"
+              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-700/70 backdrop-blur shadow-custom-Black text-white font-semibold group-hover:animate-fadeIn hidden z-50"
             >
               <p>Reminder</p>
             </div>
@@ -159,7 +157,7 @@
               />
             </svg>
             <div
-              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-500 text-white font-semibold group-hover:animate-fadeIn hidden"
+              class="absolute top-1/2 left-10 transform -translate-y-1/2 w-28 group-hover:flex justify-center items-center py-1 rounded-md bg-purple-700/70 backdrop-blur shadow-custom-Black text-white font-semibold group-hover:animate-fadeIn hidden z-50"
             >
               <p>Trash</p>
             </div>
@@ -172,80 +170,7 @@
         <div
           id="notes-container"
           class="px-5 md:pr-5 min-h-full md:pl-1 py-5 flex flex-col md:block md:columns-2 xl:columns-3 3xl:columns-4 space-y-6"
-        >
-          <div
-            class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-          >
-            <p class="text-sm text-gray-600">${currentDate("date")}</p>
-            <h3 class="text-2xl font-medium">${task.title}</h3>
-            <p class="text-lg line-clamp-6">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat
-              unde molestias deleniti, aut eaque alias illum molestiae,
-              voluptatem nesciunt ullam modi quibusdam eveniet cum odio! Libero,
-              iure ad. Quis, facilis.20
-            </p>
-          </div>
-          <div
-            class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-          >
-            <p class="text-sm text-gray-600">${currentDate("date")}</p>
-            <h3 class="text-2xl font-medium">${task.title}</h3>
-            <p class="text-lg line-clamp-6">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat
-              unde molestias deleniti, aut eaque alias illum molestiae,
-              voluptatem nesciunt ullam modi quibusdam eveniet cum odio! Libero,
-              iure ad. Quis, facilis.20
-            </p>
-          </div>
-          <div
-            class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-          >
-            <p class="text-sm text-gray-600">${currentDate("date")}</p>
-            <h3 class="text-2xl font-medium">${task.title}</h3>
-            <p class="text-lg line-clamp-6">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat
-              unde molestias deleniti, aut eaque alias illum molestiae,
-              voluptatem nesciunt ullam modi quibusdam eveniet cum odio! Libero,
-              iure ad. Quis, facilis.20
-            </p>
-          </div>
-          <div
-            class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-          >
-            <p class="text-sm text-gray-600">${currentDate("date")}</p>
-            <h3 class="text-2xl font-medium">${task.title}</h3>
-            <p class="text-lg line-clamp-6">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat
-              unde molestias deleniti, aut eaque alias illum molestiae,
-              voluptatem nesciunt ullam modi quibusdam eveniet cum odio! Libero,
-              iure ad. Quis, facilis.20
-            </p>
-          </div>
-          <div
-            class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-          >
-            <p class="text-sm text-gray-600">${currentDate("date")}</p>
-            <h3 class="text-2xl font-medium">${task.title}</h3>
-            <p class="text-lg line-clamp-6">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat
-              unde molestias deleniti, aut eaque alias illum molestiae,
-              voluptatem nesciunt ullam modi quibusdam eveniet cum odio! Libero,
-              iure ad. Quis, facilis.20
-            </p>
-          </div>
-          <div
-            class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-          >
-            <p class="text-sm text-gray-600">${currentDate("date")}</p>
-            <h3 class="text-2xl font-medium">${task.title}</h3>
-            <p class="text-lg line-clamp-6">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat
-              unde molestias deleniti, aut eaque alias illum molestiae,
-              voluptatem nesciunt ullam modi quibusdam eveniet cum odio! Libero,
-              iure ad. Quis, facilis.20
-            </p>
-          </div>
-        </div>
+        ></div>
       </section>
     </div>
     <!-- Add Note Section -->
