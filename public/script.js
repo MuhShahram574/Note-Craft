@@ -120,19 +120,38 @@ if (!localStorage.getItem("taskN0")) {
   localStorage.setItem("taskN0", 1);
 }
 let taskN0 = +localStorage.getItem("taskN0");
-console.log(taskN0);
-
-// Creating Tasks array
-let tasks;
 const setTasks = function () {
-  tasks = [];
+  let tasks = [];
   for (let index = 1; index <= taskN0; index++) {
-    if (localStorage.getItem(`task${index}`)) {
-      let task = JSON.parse(localStorage.getItem(`task${index}`));
+    const item = localStorage.getItem(`task${index}`);
+    if (item) {
+      let task = JSON.parse(item);
       tasks.push(task);
     }
   }
+  return tasks;
 };
+
+const tasks = setTasks();
+function createNewNote(tasks) {
+  notesContainer.innerHTML = "";
+  tasks.forEach((task) => {
+    const bgColor = `bg-${task.bgColor}-500`;
+    const html = `
+    <div
+    class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-3 ${bgColor}"
+    >
+    <div class="flex flex-col gap-1">
+    <p class="text-sm text-gray-700">${currentDate("date")}</p>
+    <h3 class="text-2xl font-medium">${task.title}</h3>
+    </div>
+    <p class="text-lg line-clamp-6 leading-snug">${task.description}</p>
+    </div>
+    `;
+
+    notesContainer.insertAdjacentHTML("beforeend", html);
+  });
+}
 
 const setLocalStorage = function () {
   addNotesSaveBtn.addEventListener("click", () => {
@@ -148,6 +167,7 @@ const setLocalStorage = function () {
     } else {
       const bgColor =
         checkedRadioBtn(radioBtns).nextElementSibling.textContent.toLowerCase();
+
       localStorage.setItem(
         `task${taskN0}`,
         JSON.stringify({
@@ -156,37 +176,19 @@ const setLocalStorage = function () {
           bgColor: bgColor,
         })
       );
+
+      taskN0++;
+      localStorage.setItem("taskN0", taskN0);
       newNoteCancel();
       showMsg("green", "Note Created");
-      taskN0++
-      localStorage.setItem("taskN0", taskN0);
-      setTasks();
 
-      if (tasks.length !== 0) {
-        createNewNote(tasks);
+      const updatedTasks = setTasks();
+      if (updatedTasks.length !== 0) {
+        createNewNote(updatedTasks);
       }
     }
-    console.log(taskN0);
   });
 };
-
-function createNewNote(tasks) {
-  console.log(tasks);
-
-  notesContainer.innerHTML = "";
-  tasks.forEach((task) => {
-    const html = `
-    <div
-    class="shadow-custom-Black w-full break-inside-avoid rounded-3xl p-5 flex flex-col gap-2"
-    >
-    <p class="text-sm text-gray-600">${currentDate("date")}</p>
-    <h3 class="text-2xl font-medium">${task.title}</h3>
-    <p class="text-lg line-clamp-6">${task.description}</p>
-    </div>
-    `;
-    notesContainer.insertAdjacentHTML("beforeend", html);
-  });
-}
 
 // Calling Functions
 setTasks();

@@ -1,6 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./public/**/*.{html,js}"],
+  safelist: [
+    "bg-yellow-400",
+    "bg-yellow-500",
+    "bg-yellow-600",
+    "bg-yellow-700",
+    "bg-purple-400",
+    "bg-purple-500",
+    "bg-purple-600",
+    "bg-purple-700",
+    "bg-green-400",
+    "bg-green-500",
+    "bg-green-600",
+    "bg-green-700",
+  ],
   theme: {
     extend: {
       screens: {
