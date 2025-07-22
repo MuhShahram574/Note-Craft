@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./public/*html"],
+  content: ["./public/**/*.{html,js}"],
   theme: {
     extend: {
       screens: {
@@ -11,12 +11,6 @@ module.exports = {
       },
       boxShadow: {
         "custom-Black": "0 2px 7px rgba(0, 0, 0, 0.22)",
-      },
-      minHeight: {
-        "custom-full": "89vh",
-      },
-      maxHeight: {
-        "custom-full": "89vh",
       },
       keyframes: {
         fadeIn: {
