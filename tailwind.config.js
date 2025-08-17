@@ -17,6 +17,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundColor: {
+        // dark: "#495057",
+        dark: "#343a40",
+        aside: "#eebefa",
+      },
       screens: {
         "3xl": "1920px",
       },
@@ -24,7 +29,8 @@ module.exports = {
         roboto: "Roboto, sans-serif",
       },
       boxShadow: {
-        "custom-Black": "0 2px 7px rgba(0, 0, 0, 0.22)",
+        // "custom-Black": "0 2px 7px rgba(255, 255, 255, 0.12)",
+        "custom-Black": "0 2px 7px rgba(0, 0, 0, 0.42)",
       },
       keyframes: {
         fadeIn: {
@@ -59,5 +65,17 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        ".scrollbar-hide": {
+          "-ms-overflow-style": "none" /* IE and Edge */,
+          "scrollbar-width": "none" /* Firefox */,
+        },
+        ".scrollbar-hide::-webkit-scrollbar": {
+          display: "none" /* Chrome, Safari, Opera */,
+        },
+      });
+    },
+  ],
 };

@@ -150,9 +150,11 @@ function createNewNote(tasks) {
     
     <div class="flex flex-col justify-between gap-1">
     <p class="text-sm text-gray-700">${currentDate("date")}</p>
-    <h3 class="text-2xl font-medium">${task.title}</h3>
+    <h3 class="text-2xl text-gray-900 font-medium">${task.title}</h3>
     </div>
-    <p class="text-lg line-clamp-6 leading-snug">${task.description}</p>
+    <p class="text-lg text-gray-900 line-clamp-6 leading-snug">${
+      task.description
+    }</p>
     </div>
     `;
 
