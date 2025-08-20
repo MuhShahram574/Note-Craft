@@ -19,6 +19,7 @@ const newNoteDiscription = document.getElementById("description");
 const radioBtns = [...document.querySelectorAll(".radio-btn")]; // NodeList
 const addNotesCancelBtn = document.getElementById("add-notes-cancel-btn");
 const addNotesSaveBtn = document.getElementById("add-notes-save-btn");
+const deleteBtn = document.querySelector(".delete-btn");
 // Date Entered by User
 
 // ------------------- //
@@ -143,20 +144,19 @@ function createNewNote(tasks) {
     const bgColor = `bg-${task.bgColor}-500`;
     const html = `
     <div
-    class="shadow-custom-Black w-full break-inside-avoid rounded-lg p-5 flex flex-col justify-start gap-3 ${bgColor} relative group"
+    id="task${task.taskN0}"
+    class="task-box shadow-custom-Black w-full break-inside-avoid rounded-lg p-5 flex flex-col justify-start gap-3 ${bgColor} relative group"
     >
- <div class="flex justify-center items-center bg-red-600 w-fit py-1 px-1.5 rounded-lg transition-all duration-75 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100">
+ <div class="delete-btn flex justify-center items-center bg-red-600 w-fit py-1 px-1.5 rounded-lg transition-all duration-75 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100">
         <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="15" viewBox="0 0 384 512">
         <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
      </div>
     
     <div class="flex flex-col justify-between gap-1">
-    <p class="text-sm text-gray-700">${currentDate("date")}</p>
+    <p class="text-sm text-gray-700">${task.time}</p>
     <h3 class="text-2xl text-gray-900 font-medium">${task.title}</h3>
     </div>
-    <p class="text-lg text-gray-900 line-clamp-6 leading-snug">${
-      task.description
-    }</p>
+    <p class="text-lg text-gray-900 line-clamp-6 leading-snug">${task.description}</p>
     </div>
     `;
 
@@ -187,8 +187,10 @@ const setLocalStorage = function () {
         `task${taskN0}`,
         JSON.stringify({
           title: title,
+          taskN0: taskN0,
           description: description,
           bgColor: bgColor,
+          time: currentDate("date"),
         })
       );
 
@@ -202,8 +204,22 @@ const setLocalStorage = function () {
   });
 };
 
+const deleteNotde = function () {
+  notesContainer.addEventListener("click", (e) => {
+    if (e.target.closest(".delete-btn") === deleteBtn) return;
+    const taskId = e.target.closest(".task-box").id;
+    taskN0--;
+    localStorage.removeItem(taskId);
+    localStorage.setItem("taskN0", taskN0);
+    showMsg("green", "Note Created");
+    tasks = setTasks();
+    uiUpdate();
+  });
+};
+
 // Calling Functions
 noteFormAppear();
 radioBtn();
 uiUpdate(addNotesSaveBtn);
 setLocalStorage();
+deleteNotde(tasks);
