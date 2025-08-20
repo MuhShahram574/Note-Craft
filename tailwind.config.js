@@ -61,7 +61,7 @@ module.exports = {
       },
       animation: {
         fadeIn: "fadeIn linear 0.5s",
-        showMsg: "showmsg 5s ease-in-out forwards",
+        showMsg: "showmsg 1s ease-in-out forwards",
       },
     },
   },

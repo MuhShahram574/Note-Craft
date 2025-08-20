@@ -21,7 +21,6 @@ function darkTheme() {
   addCl(header, "bg-dark");
   addCl(aside, "bg-dark");
   addCl(searchBar, "text-gray-300");
-  console.log("This is dark theme");
   removeCl(aside, "bg-white");
   removeCl(header, "bg-white");
   removeCl(searchBar, "text-gray-600");
@@ -36,7 +35,6 @@ function lightTheme() {
   removeCl(header, "bg-dark");
   removeCl(aside, "bg-dark");
   removeCl(searchBar, "text-gray-300");
-  console.log("This is dark theme");
   addCl(aside, "bg-white");
   addCl(header, "bg-white");
   addCl(searchBar, "text-gray-600");
@@ -62,13 +60,13 @@ toggleBtn.addEventListener("click", (e) => {
   }
 });
 if (curTheme === "light") {
-  darkIcon.classList.add("hidden");
-  lightIcon.classList.remove("hidden");
+  addCl(darkIcon, "hidden");
+  removeCl(lightIcon, "hidden");
   darkTheme();
   curTheme = "dark";
 } else {
-  darkIcon.classList.remove("hidden");
-  lightIcon.classList.add("hidden");
+  removeCl(darkIcon, "hidden");
+  add(lightIcon, "hidden");
   lightTheme();
   curTheme = "light";
 }

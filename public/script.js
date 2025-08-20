@@ -47,10 +47,12 @@ const removeClass = (btn) => {
 
 const showMsg = function (color, msg) {
   alertBox.classList.remove("hidden");
+  alertBox.classList.add("border-b-2", `border-${color}-600`);
   alertMsg.textContent = msg;
   setTimeout(() => {
+    alertBox.classList.remove("border-b-2", `border-${color}-600`);
     alertBox.classList.add("hidden");
-  }, 5000);
+  }, 1000);
 };
 
 // CREATING DATES AND TIMES WITH ISO...
@@ -143,7 +145,7 @@ function createNewNote(tasks) {
     <div
     class="shadow-custom-Black w-full break-inside-avoid rounded-lg p-5 flex flex-col justify-start gap-3 ${bgColor} relative group"
     >
- <div class="flex justify-center items-center bg-gray-900 w-fit py-1 px-1.5 rounded-full transition-all duration-75 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute -right-1 -top-1 opacity-0 group-hover:opacity-100">
+ <div class="flex justify-center items-center bg-red-600 w-fit py-1 px-1.5 rounded-lg transition-all duration-75 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100">
         <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="15" viewBox="0 0 384 512">
         <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
      </div>
