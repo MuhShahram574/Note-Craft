@@ -14,6 +14,7 @@ const alertMsg = document.querySelector(".alert-msg");
 // Input Fields
 const newNoteTitle = document.getElementById("title");
 const newNoteDiscription = document.getElementById("description");
+searchBar = document.querySelector(".search-bar");
 
 // Buttons
 const radioBtns = [...document.querySelectorAll(".radio-btn")]; // NodeList
@@ -210,8 +211,8 @@ const setLocalStorage = function () {
 // Deleting a Note
 const deleteNotde = function () {
   notesContainer.addEventListener("click", (e) => {
-    if (![...e.target.closest(".delete-btn").classList].includes("delete-btn"))
-      return;
+    if (!e.target.closest(".delete-btn")) return;
+
     const taskId = e.target.closest(".task-box").id;
     const deletedTask = JSON.parse(localStorage.getItem(taskId));
     setStorage(
@@ -235,6 +236,25 @@ const deleteNotde = function () {
     uiUpdate();
   });
 };
+
+// Search Functionallity...
+
+const searchtask = function () {
+  searchBar.addEventListener("input", (e) => {
+    const target = e.target.value.toLowerCase();
+
+    const taskBoxs = Array.from(document.querySelectorAll(".task-box"));
+    const taskNames = taskBoxs.map((box) => box.querySelector("h3"));
+    taskNames.forEach((taskName) => {
+      const taskparent = taskName.closest(".task-box");
+      const text = taskName.textContent.toLowerCase();
+      text.includes(target)
+        ? taskparent.classList.remove("hidden")
+        : taskparent.classList.add("hidden");
+    });
+  });
+};
+document.addEventListener("DOMContentLoaded", searchtask);
 
 // Calling Functions
 function run() {
