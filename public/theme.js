@@ -1,7 +1,7 @@
 const toggleBtn = document.querySelector(".toggle-btn");
 const header = document.querySelector("header");
 let searchBar = document.querySelector(".search-bar");
-const aside = document.querySelector("aside div");
+let aside = document.querySelector("aside div");
 const lightIcon = document.querySelector(".light");
 const darkIcon = document.querySelector(".dark");
 

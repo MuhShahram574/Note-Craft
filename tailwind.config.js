@@ -2,7 +2,6 @@
 module.exports = {
   content: ["./public/**/*.{html,js}"],
   safelist: [
-    
     "bg-red-500",
     "bg-red-600",
     "bg-blue-500",
