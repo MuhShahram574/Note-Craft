@@ -17,10 +17,11 @@ const newNoteDiscription = document.getElementById("description");
 
 // Buttons
 const radioBtns = [...document.querySelectorAll(".radio-btn")]; // NodeList
+const radioBtnsBox = document.querySelector(".radio-btn-box");
 const addNotesCancelBtn = document.getElementById("add-notes-cancel-btn");
 const addNotesSaveBtn = document.getElementById("add-notes-save-btn");
-const deleteBtn = document.querySelector(".delete-btn");
-// Date Entered by User
+
+// ///////////////////////////////////////////
 
 // ------------------- //
 // ADD A NEW NOTE...
@@ -30,11 +31,11 @@ const checkedRadioBtn = function (btns) {
   const bgColor = btns.find((btn) =>
     [...btn.classList].some(
       (cla) =>
-        cla === "bg-green-600" ||
-        cla === "bg-yellow-600" ||
-        cla === "bg-purple-600"
+        cla === "bg-green-600" || cla === "bg-red-600" || cla === "bg-blue-600"
     )
   );
+  bgColor;
+
   return bgColor;
 };
 
@@ -43,7 +44,7 @@ const clearFields = function (field_1, field_2) {
 };
 
 const removeClass = (btn) => {
-  return btn.classList.remove("bg-yellow-600", "bg-green-600", "bg-purple-600");
+  return btn.classList.remove("bg-blue-600", "bg-green-600", "bg-red-600");
 };
 
 const setStorage = function (name, description) {
@@ -102,26 +103,23 @@ const noteFormAppear = function () {
   });
 };
 
-// functionality of Radio btns
 function radioBtn() {
-  radioBtns.forEach((btn) => {
-    removeClass(btn);
-    btn.addEventListener("click", () => {
-      const btnColor = btn.nextElementSibling.textContent.toLocaleLowerCase();
-      radioBtns.forEach((btn) => removeClass(btn));
-      if (["purple", "green", "yellow"].includes(btnColor)) {
-        btn.classList.add(`bg-${btnColor}-600`);
-      }
-
-      return btnColor;
-    });
+  // radioBtns.forEach((btn) => removeClass(btn));
+  radioBtnsBox.addEventListener("click", (e) => {
+    const cond = [...e.target.classList].includes("radio-btn");
+    if (!cond) return;
+    const btnColor =
+      e.target.nextElementSibling.textContent.toLocaleLowerCase();
+    radioBtns.forEach((btn) => removeClass(btn));
+    e.target.classList.add(`bg-${btnColor}-600`);
+    return btnColor;
   });
 }
 
 // SETTING DATA TO LOCAL STORAGE...
 if (!localStorage.getItem("taskNo")) {
-  setStorage('taskNo', 1);
-  setStorage('deletedTaskNo', 1);
+  setStorage("taskNo", 1);
+  setStorage("deletedTaskNo", 1);
 }
 let taskNo = +localStorage.getItem("taskNo");
 let deletedTaskNo = +localStorage.getItem("deletedTaskNo");
@@ -131,7 +129,6 @@ let deletedTasks;
 // Updating Tasks Array...
 const setTasks = function (arr, length, arrName = "task") {
   arr = [];
-
   for (let index = 1; index <= length; index++) {
     let item = localStorage.getItem(`${arrName + index}`);
     if (item) {
@@ -153,18 +150,18 @@ function createNewNote(tasks) {
     const html = `
     <div
     id="task${task.taskNo}"
-    class="task-box shadow-custom-Black w-full break-inside-avoid rounded-lg p-5 flex flex-col justify-start gap-3 ${bgColor} relative group"
+    class="task-box shadow-custom-Black w-full break-inside-avoid rounded-lg p-2.5 md:p-5 flex flex-col justify-start gap-3 ${bgColor} relative group"
     >
- <div class="delete-btn flex justify-center items-center bg-red-600 w-fit py-1 px-1.5 rounded-lg transition-all duration-75 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100">
+ <div class="delete-btn flex justify-center items-center bg-red-600 hover:bg-red-700 w-fit py-1 px-1.5 rounded-lg transition-all duration-200 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100">
         <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="15" viewBox="0 0 384 512">
         <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
      </div>
     
     <div class="flex flex-col justify-between gap-1">
-    <p class="text-sm text-gray-700">${task.time}</p>
+    <p class="text-sm text-gray-700 ">${task.time}</p>
     <h3 class="text-2xl text-gray-900 font-medium">${task.title}</h3>
     </div>
-    <p class="text-lg text-gray-900 line-clamp-6 leading-snug">${task.description}</p>
+    <p class="text-lg text-gray-800 line-clamp-6 leading-snug">${task.description}</p>
     </div>
     `;
 
@@ -177,7 +174,8 @@ const uiUpdate = function () {
 };
 // Setting the localStorage
 const setLocalStorage = function () {
-  addNotesSaveBtn.addEventListener("click", () => {
+  addNotesSaveBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     const title = newNoteTitle.value;
     const description = newNoteDiscription.value;
 
@@ -190,7 +188,6 @@ const setLocalStorage = function () {
     } else {
       const bgColor =
         checkedRadioBtn(radioBtns).nextElementSibling.textContent.toLowerCase();
-
       setStorage(
         `task${taskNo}`,
         JSON.stringify({
@@ -201,9 +198,8 @@ const setLocalStorage = function () {
           time: currentDate("date"),
         })
       );
-
       taskNo++;
-      setStorage('taskNo', taskNo);
+      setStorage("taskNo", taskNo);
       newNoteCancel();
       showMsg("Note Created");
       tasks = setTasks(tasks, taskNo);
@@ -211,10 +207,11 @@ const setLocalStorage = function () {
     }
   });
 };
-
+// Deleting a Note
 const deleteNotde = function () {
   notesContainer.addEventListener("click", (e) => {
-    if (e.target.closest(".delete-btn") === deleteBtn) return;
+    if (![...e.target.closest(".delete-btn").classList].includes("delete-btn"))
+      return;
     const taskId = e.target.closest(".task-box").id;
     const deletedTask = JSON.parse(localStorage.getItem(taskId));
     setStorage(
@@ -229,9 +226,9 @@ const deleteNotde = function () {
     );
     taskNo--;
     deletedTaskNo++;
-    localStorage.removeItem(taskId);
-    setStorage('taskNo', taskNo);
-    setStorage('deletedTaskNo', deletedTaskNo);
+    localStorage.removeItem(`task${taskNo}`);
+    setStorage("taskNo", taskNo);
+    setStorage("deletedTaskNo", deletedTaskNo);
     showMsg("Note Deleted");
     tasks = setTasks(tasks, taskNo);
     deletedTasks = setTasks(deletedTasks, deletedTaskNo, "deletedtask");
@@ -240,9 +237,11 @@ const deleteNotde = function () {
 };
 
 // Calling Functions
-noteFormAppear();
-radioBtn();
-uiUpdate(addNotesSaveBtn);
-setLocalStorage();
-deleteNotde(tasks);
-console.log(deletedTasks, tasks);
+function run() {
+  noteFormAppear();
+  radioBtn();
+  uiUpdate(addNotesSaveBtn);
+  setLocalStorage();
+  deleteNotde(tasks);
+}
+run();
