@@ -3,11 +3,7 @@ const header = document.querySelector("header");
 let searchBar = document.querySelector(".search-bar");
 const lightIcon = document.querySelector(".light");
 const darkIcon = document.querySelector(".dark");
-// Helper functions
-const toggleClasses = (el, add = [], remove = []) => {
-  el.classList.add(...add);
-  el.classList.remove(...remove);
-};
+
 
 // Dark Theme
 function darkTheme() {
@@ -56,14 +52,4 @@ toggleBtn.addEventListener("click", (e) => {
     }
   }
 });
-if (curTheme === "light") {
-  darkIcon.classList.add("hidden");
-  lightIcon.classList.remove("hidden");
-  darkTheme();
-  curTheme = "dark";
-} else {
-  darkIcon.classList.remove("hidden");
-  lightIcon.classList.add("hidden");
-  lightTheme();
-  curTheme = "light";
-}
+
