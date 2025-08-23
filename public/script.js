@@ -6,7 +6,7 @@
 const addNotesSec = document.getElementById("add-notes-section");
 const notesContainer = document.getElementById("notes-container");
 
-//  Elements
+// Elements
 const newNoteBtn = document.getElementById("new-note");
 const alertBox = document.querySelector(".alert");
 const alertMsg = document.querySelector(".alert-msg");
@@ -23,36 +23,38 @@ const radioBtns = [...document.querySelectorAll(".radio-btn")]; // NodeList
 const radioBtnsBox = document.querySelector(".radio-btn-box");
 const addNotesCancelBtn = document.getElementById("add-notes-cancel-btn");
 const addNotesSaveBtn = document.getElementById("add-notes-save-btn");
-const trashIcon = document.querySelector(".trash");
+
+// curContainer
+// let curContainer = "notesContainer";
 
 // ///////////////////////////////////////////
 
 // ------------------- //
-// ADD A NEW NOTE...
+// HELPER FUNCTIONS
 // ------------------- //
 
 const checkedRadioBtn = function (btns) {
-  const bgColor = btns.find((btn) =>
-    [...btn.classList].some(
-      (cla) =>
-        cla === "bg-green-600" || cla === "bg-red-600" || cla === "bg-blue-600"
+  return btns.find((btn) =>
+    [...btn.classList].some((cla) =>
+      ["bg-green-600", "bg-red-600", "bg-blue-600"].includes(cla)
     )
   );
-  bgColor;
-
-  return bgColor;
 };
 
-const clearFields = function (field_1, field_2) {
-  field_1.value = field_2.value = "";
+const clearFields = function (...fields) {
+  fields.forEach((field) => (field.value = ""));
 };
 
 const removeClass = (btn) => {
-  return btn.classList.remove("bg-blue-600", "bg-green-600", "bg-red-600");
+  btn.classList.remove("bg-blue-600", "bg-green-600", "bg-red-600");
 };
 
-const setStorage = function (name, description) {
-  localStorage.setItem(name, description);
+const setStorage = (name, value) => {
+  localStorage.setItem(name, value);
+};
+
+const getStorage = (name) => {
+  return localStorage.getItem(name);
 };
 
 const showMsg = function (msg) {
@@ -60,10 +62,10 @@ const showMsg = function (msg) {
   alertMsg.textContent = msg;
   setTimeout(() => {
     alertBox.classList.add("hidden");
-  }, 3000);
+  }, 1000);
 };
 
-// CREATING DATES AND TIMES WITH ISO...
+// DATE & TIME
 const currentDate = function (need, ISO = Date.now()) {
   const isoDate = new Date(ISO);
   if (need === "date") {
@@ -90,6 +92,10 @@ const currentDate = function (need, ISO = Date.now()) {
   }
 };
 
+// ------------------- //
+// NOTE FORM HANDLING
+// ------------------- //
+
 function newNoteCancel() {
   addNotesSec.classList.add("hidden");
   addNotesSec.classList.remove("flex");
@@ -108,194 +114,189 @@ const noteFormAppear = function () {
 };
 
 function radioBtn() {
-  // radioBtns.forEach((btn) => removeClass(btn));
   radioBtnsBox.addEventListener("click", (e) => {
-    const cond = [...e.target.classList].includes("radio-btn");
-    if (!cond) return;
-    const btnColor =
-      e.target.nextElementSibling.textContent.toLocaleLowerCase();
+    if (!e.target.classList.contains("radio-btn")) return;
+    const btnColor = e.target.nextElementSibling.textContent.toLowerCase();
     radioBtns.forEach((btn) => removeClass(btn));
     e.target.classList.add(`bg-${btnColor}-600`);
-    return btnColor;
   });
 }
 
-// SETTING DATA TO LOCAL STORAGE...
-if (!localStorage.getItem("taskNo")) {
-  setStorage("taskNo", 1);
-  setStorage("deletedTaskNo", 1);
-}
-let taskNo = +localStorage.getItem("taskNo");
-let deletedTaskNo = +localStorage.getItem("deletedTaskNo");
+// ------------------- //
+// TASK HANDLING
+// ------------------- //
 
-let tasks;
-let deletedTasks;
-// Updating Tasks Array...
-const setTasks = function (arr, length, arrName = "task") {
-  arr = [];
-  for (let index = 1; index <= length; index++) {
-    let item = localStorage.getItem(`${arrName + index}`);
-    if (item) {
-      let task = JSON.parse(item);
-      arr.push(task);
-    }
-  }
-  return arr;
+let tasks = JSON.parse(getStorage("tasks") || "[]");
+let deletedTasks = JSON.parse(getStorage("deletedTasks") || "[]");
+
+const saveTasks = () => {
+  setStorage("tasks", JSON.stringify(tasks));
+  setStorage("deletedTasks", JSON.stringify(deletedTasks));
 };
-// Creating the main task array...
-tasks = setTasks(tasks, taskNo);
-deletedTasks = setTasks(deletedTasks, deletedTaskNo, "deletedtask");
 
-// Crating a new note...
-function createNewNote(arr) {
+function createNewNote(arr, isDeleted = false) {
   notesContainer.innerHTML = "";
   arr.forEach((item, i) => {
     const bgColor = `bg-${item.bgColor}-500`;
-    const delay = (i * 0.2).toFixed(1); // Each task delayed by 0.3s
-    console.log(item);
-
+    const delay = (i * 0.2).toFixed(1);
     const html = `
-    <div
-    id="task${item.taskNo}"
-    class="task-box shadow-custom-Black w-full break-inside-avoid rounded-lg p-2.5 md:p-5 flex flex-col justify-start gap-3 ${bgColor} relative group animate-fadeIn"
-    style="animation-delay: ${delay}s;"
-    >
-   <div class="delete-btn flex justify-center items-center bg-red-600 hover:bg-red-700 w-fit py-1 px-1.5 rounded-lg transition-all duration-200 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="15" viewBox="0 0 384 512">
-      <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
-     </div>
-    
-    <div class="flex flex-col justify-between gap-1">
-    <p class="text-sm text-gray-700 ">${item.time}</p>
-    <h3 class="text-2xl text-gray-900 font-medium">${item.title}</h3>
-    </div>
-    <p class="text-lg text-gray-800 line-clamp-6 leading-snug">${item.description}</p>
-    </div>
+      <div
+        id="${item.id}"
+        class="task-box shadow-custom-Black w-full break-inside-avoid rounded-lg p-2.5 md:p-5 flex flex-col justify-start gap-3 ${bgColor} relative group animate-fadeIn"
+        style="animation-delay: ${delay}s;"
+      >
+      <div class="${
+        isDeleted ? "restore" : "delete-btn"
+      } flex justify-center items-center bg-red-600 hover:bg-red-700 w-fit py-1 px-1.5 rounded-lg transition-all duration-200 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-0 top-0 opacity-0 group-hover:opacity-100 ${
+      isDeleted ? "restore" : ""
+    }">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="16" viewBox="0 0 384 512">
+          <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+        </svg>
+      </div>
+      <div class="${
+        isDeleted ? "delete-btn" : "restore"
+      } flex justify-center items-center bg-green-600 hover:bg-green-700 w-fit py-1 px-1.5 rounded-lg transition-all duration-200 shadow-custom-Black -translate-y-1 active:translate-y-0 active:shadow-none cursor-pointer absolute right-7 top-0 opacity-0 group-hover:opacity-100 ${
+      isDeleted ? "" : "hidden"
+    }">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" width="16" viewBox="0 0 640 640">
+        <path d="M263.1 48L377 48C390.8 48 403 56.8 407.4 69.9L416 96L512 96C529.7 96 544 110.3 544 128C544 145.7 529.7 160 512 160L128 160C110.3 160 96 145.7 96 128C96 110.3 110.3 96 128 96L224 96L232.7 69.9C237.1 56.8 249.3 48 263.1 48zM128 208L512 208L490.9 531.1C489.3 556.4 468.3 576 443 576L197 576C171.7 576 150.7 556.4 149.1 531.1L128 208zM337 287C327.6 277.6 312.4 277.6 303.1 287L231.1 359C221.7 368.4 221.7 383.6 231.1 392.9C240.5 402.2 255.7 402.3 265 392.9L296 361.9L296 464C296 477.3 306.7 488 320 488C333.3 488 344 477.3 344 464L344 361.9L375 392.9C384.4 402.3 399.6 402.3 408.9 392.9C418.2 383.5 418.3 368.3 408.9 359L336.9 287z"/></svg>
+      </div>
+        <div class="flex flex-col justify-between gap-1">
+          <p class="text-sm text-gray-700">${item.time}</p>
+          <h3 class="text-2xl text-gray-900 font-medium">${item.title}</h3>
+        </div>
+        <p class="text-lg text-gray-800 line-clamp-6 leading-snug">${
+          item.description
+        }</p>
+      </div>
     `;
-
     notesContainer.insertAdjacentHTML("beforeend", html);
   });
 }
-const uiUpdate = function () {
-  setTasks(tasks, taskNo);
-  createNewNote(tasks);
+
+const uiUpdate = (arr) => {
+  saveTasks();
+  createNewNote(arr);
 };
-// Setting the localStorage
+
+// ------------------- //
+// LOCAL STORAGE HANDLING
+// ------------------- //
+
 const setLocalStorage = function () {
   addNotesSaveBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    const title = newNoteTitle.value;
-    const description = newNoteDiscription.value;
+    const title = newNoteTitle.value.trim();
+    const description = newNoteDiscription.value.trim();
 
-    if (title === "") {
-      showMsg("Enter note title...");
-    } else if (description === "") {
-      showMsg("Enter note description...");
-    } else if (checkedRadioBtn(radioBtns) === undefined) {
-      showMsg("Pick a color");
-    } else {
-      const bgColor =
-        checkedRadioBtn(radioBtns).nextElementSibling.textContent.toLowerCase();
-      setStorage(
-        `task${taskNo}`,
-        JSON.stringify({
-          title: title,
-          taskNo: taskNo,
-          description: description,
-          bgColor: bgColor,
-          time: currentDate("date"),
-        })
-      );
-      taskNo++;
-      setStorage("taskNo", taskNo);
-      newNoteCancel();
-      showMsg("Note Created");
-      tasks = setTasks(tasks, taskNo);
-      uiUpdate();
-    }
+    if (!title) return showMsg("Enter note title...");
+    if (!description) return showMsg("Enter note description...");
+    if (!checkedRadioBtn(radioBtns)) return showMsg("Pick a color");
+
+    const bgColor =
+      checkedRadioBtn(radioBtns).nextElementSibling.textContent.toLowerCase();
+
+    const newTask = {
+      id: Date.now(), // unique id
+      title,
+      description,
+      bgColor,
+      time: currentDate("date"),
+    };
+
+    tasks.push(newTask);
+    uiUpdate(tasks);
+    newNoteCancel();
+    showMsg("Note Created");
   });
 };
-// Deleting a Note
-const deleteNotde = function () {
+
+// ------------------- //
+// DELETE HANDLING
+// ------------------- //
+
+const restoreNotes = function (cutarr, setarr) {
   notesContainer.addEventListener("click", (e) => {
-    if (!e.target.closest(".delete-btn")) return;
+    const btn = e.target.closest(".delete-btn");
+    if (!btn) return;
 
-    const taskId = e.target.closest(".task-box").id;
-    const deletedTask = JSON.parse(localStorage.getItem(taskId));
-    console.log(deletedTask, taskId);
-    console.log(deletedTaskNo);
+    const taskBox = btn.closest(".task-box");
+    const taskId = +taskBox.id;
 
-    setStorage(
-      `deletedtask${deletedTaskNo}`,
-      JSON.stringify({
-        title: deletedTask.title,
-        taskNo: deletedTaskNo,
-        description: deletedTask.description,
-        bgColor: deletedTask.bgColor,
-        time: currentDate("date"),
-      })
-    );
-    taskNo--;
-    deletedTaskNo++;
-    localStorage.removeItem(`task${taskNo}`);
-    setStorage("taskNo", taskNo);
-    setStorage("deletedTaskNo", deletedTaskNo);
+    const taskIndex = cutarr.findIndex((t) => t.id === taskId);
+    if (taskIndex === -1) return;
+
+    // Move to deleted tasks
+    const deletedTask = cutarr.splice(taskIndex, 1)[0];
+    setarr.push(deletedTask);
+
+    uiUpdate(cutarr);
     showMsg("Note Deleted");
-    tasks = setTasks(tasks, taskNo);
-    deletedTasks = setTasks(deletedTasks, deletedTaskNo, "deletedtask");
-    uiUpdate();
   });
 };
 
-// Search Functionallity...
+// ------------------- //
+// SEARCH HANDLING
+// ------------------- //
 
-const searchtask = function () {
+const searchTask = function () {
   searchBar.addEventListener("input", (e) => {
     const target = e.target.value.toLowerCase();
+    const taskBoxes = document.querySelectorAll(".task-box");
 
-    const taskBoxs = Array.from(document.querySelectorAll(".task-box"));
-    const taskNames = taskBoxs.map((box) => box.querySelector("h3"));
-    taskNames.forEach((taskName) => {
-      const taskparent = taskName.closest(".task-box");
-      const text = taskName.textContent.toLowerCase();
-      text.includes(target)
-        ? taskparent.classList.remove("hidden")
-        : taskparent.classList.add("hidden");
+    taskBoxes.forEach((box) => {
+      const title = box.querySelector("h3").textContent.toLowerCase();
+      title.includes(target)
+        ? box.classList.remove("hidden")
+        : box.classList.add("hidden");
     });
   });
 };
-document.addEventListener("DOMContentLoaded", searchtask);
+document.addEventListener("DOMContentLoaded", searchTask);
 
-// Trash bin Functionallity...
+// ------------------- //
+// ASIDE HANDLING
+// ------------------- //
 
-const asideFunct = function () {
+const asideHandler = function () {
   aside.addEventListener("click", (e) => {
-    const target = e.target.closest("div").classList;
-    // console.log(target.contains("notes"))
+    const target = e.target.closest("div");
+    if (!target) return;
 
-    if (target.contains("notes")) {
+    if (target.classList.contains("notes")) {
       createNewNote(tasks);
       showMsg("Current Notes");
-      console.log(e.target);
-
-      noteTitle.textContent = "Notes";
-    } else if (target.contains("trash")) {
-      createNewNote(deletedTasks);
+      noteTitle.textContent = "Current Notes";
+      restoreNotes(tasks, deletedTasks);
+    } else if (target.classList.contains("trash")) {
+      createNewNote(deletedTasks, true);
+      // curContainer = "trash";
       showMsg("Deleted Notes");
       noteTitle.textContent = "Trash";
-      e.target.closest("div").classList.add("focus:bg-green-400");
-      // e.target.closest("div").classList.remove("bg-green-400");
+      restoreNotes(deletedTasks, tasks);
+    } else if (target.classList.contains("Reminder")) {
+      showMsg("Reminder Notes");
+      notesContainer.innerHTML = "";
+      noteTitle.textContent = "Coming Soon...";
+    } else if (target.classList.contains("Achieve")) {
+      notesContainer.innerHTML = "";
+      showMsg("Achieve Notes");
+      noteTitle.textContent = "Coming Soon...";
     }
   });
 };
 
-// Calling Functions
-function run() {
+// ------------------- //
+// INIT
+// ------------------- //
+
+function init() {
   noteFormAppear();
   radioBtn();
-  uiUpdate(addNotesSaveBtn);
+  uiUpdate(tasks);
   setLocalStorage();
-  deleteNotde();
-  asideFunct();
+  restoreNotes(tasks, deletedTasks);
+  asideHandler();
 }
-run();
+init();
