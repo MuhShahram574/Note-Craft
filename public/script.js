@@ -199,15 +199,10 @@ function radioBtn() {
     if (!target) return;
 
     // prefer data-color, fallback to sibling label text
-    const dataColor = target.dataset?.color?.toLowerCase();
     const textColor = target.nextElementSibling?.textContent
       ?.trim()
       ?.toLowerCase();
-    const btnColor = COLOR_KEYS.includes(dataColor)
-      ? dataColor
-      : COLOR_KEYS.includes(textColor)
-      ? textColor
-      : null;
+    const btnColor = COLOR_KEYS.includes(textColor) ? textColor : null;
 
     // Clear previous selected color classes
     radioBtns.forEach((btn) => removeClass(btn, COLOR_CLASSES_600));
