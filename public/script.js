@@ -362,8 +362,8 @@ const showTask = function () {
 
   const viewTask = function (e) {
     const taskBox = e.target.closest(".task-box");
-    const taskId = +taskBox.id;
     if (taskBox && !e.target.closest(".btn")) {
+      const taskId = +taskBox.id;
       const arr = curContainer === "notes" ? tasks : deletedTasks;
       const obj = arr.find((t) => t.id === taskId);
       const title = showNoteSec.querySelector(".full-note-title");
