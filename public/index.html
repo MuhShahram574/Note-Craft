@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-  rel="stylesheet" />
+    rel="stylesheet" />
   <link rel="stylesheet" href="../public/style.css" />
   <script defer src="../public/script.js"></script>
   <script defer src="../public/theme.js"></script>
@@ -135,15 +135,15 @@
   <!-- Add Note Section -->
   <section>
     <div id="add-notes-section"
-      class="bg-white min-h-screen min-w-full absolute top-0 hidden justify-center items-center">
+      class="bg-white backdrop-blur-md min-h-screen min-w-full absolute top-0 hidden justify-center items-center">
       <div class="p-7 flex flex-col gap-12 rounded-2xl shadow-custom-Black">
         <form class="flex flex-col gap-5">
           <input id="title" type="text"
             class="bg-transparent px-4 py-2 rounded-xl text-lg outline-none shadow-custom-Black"
             placeholder="Note Title" required />
           <textarea name="description" id="description"
-            class="bg-transparent px-4 py-2 rounded-xl text-lg outline-none shadow-custom-Black"  rows="7"
-            placeholder="Discription" required></textarea>
+            class="bg-transparent px-4 py-2 rounded-xl text-lg outline-none shadow-custom-Black resize-none scrollbar-hide"
+            cols="25" rows="7" placeholder="Discription" required></textarea>
           <div class="radio-btn-box flex gap-4">
             <div class="flex gap-1">
               <div class="radio-btn cursor-pointer h-6 w-6 border-4 border-green-400  rounded-full"></div>
@@ -167,6 +167,15 @@
             class="add-notes-btn px-5 py-1.5 text-gray-100 shadow-custom-Black rounded-3xl bg-purple-700 cursor-pointer transition-all duration-100 -translate-y-1 active:translate-y-0 active:shadow-md" />
         </div>
       </div>
+    </div>
+  </section>
+
+  <section id="show-full-note"
+    class="bg-dark/5 backdrop-blur-md  min-h-screen min-w-full absolute top-0  justify-center items-center hidden text-gray-800">
+    <div
+      class="note-show-box bg-green-500 w-3/4 md:w-3/5 max-h-[70vh] rounded-2xl shadow-custom-Black p-5 flex flex-col ">
+      <div class="full-note-title text-2xl font-semibold px-2 py-1 border-b border-gray-300 mb-1"></div>
+      <div class="full-note-description text-lg outline-none scrollbar-hide p-2 py-5 h-full overflow-y-scroll"></div>
     </div>
   </section>
 
