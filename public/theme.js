@@ -1,6 +1,6 @@
 const toggleBtn = document.querySelector(".toggle-btn");
 const header = document.querySelector("header");
-let searchBar = document.querySelector(".search-bar");
+ searchBar = document.querySelector(".search-bar");
 const lightIcon = document.querySelector(".light");
 const darkIcon = document.querySelector(".dark");
 
@@ -34,20 +34,43 @@ function lightTheme() {
   // toggleClasses(header, ["bg-white"], ["bg-dark"]); // optional
 }
 
-let curTheme = "light";
-toggleBtn.addEventListener("click", (e) => {
-if (e.target === e.currentTarget) return;
-if (e.target.closest("svg")) {
-if (curTheme === "light") {
-  darkIcon.classList.add("hidden");
-  lightIcon.classList.remove("hidden");
-  darkTheme();
-  curTheme = "dark";
-} else {
+// Setting the theme...
+
+// Get theme from localStorage or default to 'light'
+let curTheme = localStorage.getItem("curTheme") || "light";
+
+const setTheme = function (theme) {
+  curTheme = theme;
+  localStorage.setItem("curTheme", curTheme);
+};
+
+// Apply theme on page load
+if (curTheme === "dark") {
   darkIcon.classList.remove("hidden");
   lightIcon.classList.add("hidden");
+  darkTheme();
+} else {
+  darkIcon.classList.add("hidden");
+  lightIcon.classList.remove("hidden");
   lightTheme();
-  curTheme = "light";
 }
-}
+
+toggleBtn.addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) return;
+  if (e.target.closest("svg")) {
+    if (curTheme === "light") {
+      darkIcon.classList.remove("hidden");
+      lightIcon.classList.add("hidden");
+      darkTheme();
+      setTheme("dark");
+      return;
+    }
+    if (curTheme === "dark") {
+      darkIcon.classList.add("hidden");
+      lightIcon.classList.remove("hidden");
+      lightTheme();
+      setTheme("light");
+      return;
+    }
+  }
 });
