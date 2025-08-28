@@ -1,76 +1,76 @@
+// ------------------------- //
+// SELECTING ELEMENTS
+// ------------------------- //
 const toggleBtn = document.querySelector(".toggle-btn");
 const header = document.querySelector("header");
- searchBar = document.querySelector(".search-bar");
-const lightIcon = document.querySelector(".light");
-const darkIcon = document.querySelector(".dark");
+const light = document.querySelector(".light");
+const dark = document.querySelector(".dark");
 
-// Dark Theme
+// ------------------------- //
+// THEMES
+// ------------------------- //
 function darkTheme() {
   toggleClasses(
     document.body,
     ["bg-dark", "text-gray-100"],
     ["bg-gray-100/50"]
   );
-
-  toggleClasses(addNotesSec, ["bg-dark"], ["bg-white"]);
-
+  toggleClasses(addNotesSec, ["bg-dark"], ["bg-gray-100", "bg-white"]);
   toggleClasses(searchBar, ["text-gray-300"], ["text-gray-600"]);
-
-  // toggleClasses(header, ["bg-dark"], ["bg-white"]); // optional
 }
 
-// Light Theme
 function lightTheme() {
   toggleClasses(
     document.body,
     ["bg-gray-100/50"],
     ["bg-dark", "text-gray-100"]
   );
-
-  toggleClasses(addNotesSec, ["bg-gray-100"], ["bg-dark"]);
-
+  toggleClasses(addNotesSec, ["bg-gray-100", "bg-white"], ["bg-dark"]);
   toggleClasses(searchBar, ["text-gray-600"], ["text-gray-300"]);
-
-  // toggleClasses(header, ["bg-white"], ["bg-dark"]); // optional
 }
 
-// Setting the theme...
+// ------------------------- //
+// LOCAL STORAGE
+// ------------------------- //
+let curTheme = localStorage.getItem("curTheme");
 
-// Get theme from localStorage or default to 'light'
-let curTheme = localStorage.getItem("curTheme") || "light";
-
-const setTheme = function (theme) {
-  curTheme = theme;
-  localStorage.setItem("curTheme", curTheme);
-};
+// If no theme is saved, default to light
+if (!curTheme) {
+  curTheme = "light";
+  localStorage.setItem("curTheme", "light");
+}
 
 // Apply theme on page load
-if (curTheme === "dark") {
-  darkIcon.classList.remove("hidden");
-  lightIcon.classList.add("hidden");
-  darkTheme();
-} else {
-  darkIcon.classList.add("hidden");
-  lightIcon.classList.remove("hidden");
-  lightTheme();
+function applyTheme(theme) {
+  if (theme === "dark") {
+    darkTheme();
+    light.classList.remove("hidden");
+    dark.classList.add("hidden");
+  } else {
+    lightTheme();
+    dark.classList.remove("hidden");
+    light.classList.add("hidden");
+  }
 }
 
-toggleBtn.addEventListener("click", (e) => {
-  if (e.target === e.currentTarget) return;
-  if (e.target.closest("svg")) {
-    if (curTheme === "light") {
-      darkIcon.classList.remove("hidden");
-      lightIcon.classList.add("hidden");
-      darkTheme();
-      setTheme("dark");
-      return;
-    }
-    if (curTheme === "dark") {
-      darkIcon.classList.add("hidden");
-      lightIcon.classList.remove("hidden");
-      lightTheme();
-      setTheme("light");
-      return;
-    }
+applyTheme(curTheme);
+
+// ------------------------- //
+// SET THEME FUNCTION
+// ------------------------- //
+function setTheme(theme) {
+  localStorage.setItem("curTheme", theme);
+  curTheme = theme;
+  applyTheme(theme);
+}
+
+// ------------------------- //
+// EVENT LISTENER
+// ------------------------- //
+toggleBtn.addEventListener("click", () => {
+  if (curTheme === "light") {
+    setTheme("dark");
+  } else {
+    setTheme("light");
   }
 });

@@ -124,7 +124,7 @@
         <section class="col-span-4 sm:col-span-7 md:col-span-11 row-span-8 overflow-y-scroll scrollbar-hide">
             <div>
                 <div class="py-5 px-5 md:px-7 flex justify-between items-center border-b border-gray-500/20">
-                    <h1 id="note-title" class="text-3xl font-bold tracking-wider">Current Tasks</h1>
+                    <h1 id="note-title" class="text-3xl font-bold tracking-wider">Current Notes</h1>
                 </div>
                 <div id="notes-container"
                     class="px-5 py-5 min-h-full flex flex-col md:block md:columns-2 xl:columns-3 3xl:columns-4 space-y-4 ">
@@ -144,6 +144,13 @@
                     <textarea name="description" id="description"
                         class="bg-transparent px-4 py-2 rounded-xl text-lg outline-none shadow-custom-Black resize-none scrollbar-hide"
                         cols="25" rows="7" placeholder="Discription" required></textarea>
+                    <!-- Reminder input: optional datetime for scheduling reminders -->
+                    <div class="flex flex-col gap-1">
+                        <label for="reminder-time" class="text-sm">Reminder (optional)</label>
+                        <input id="reminder-time" type="time"
+                            class="bg-transparent px-4 py-2 rounded-xl text-base outline-none shadow-custom-Black"
+                            placeholder="Set reminder" />
+                    </div>
                     <div class="radio-btn-box flex gap-4">
                         <div class="flex gap-1">
                             <div class="radio-btn cursor-pointer h-6 w-6 border-4 border-green-400  rounded-full"></div>

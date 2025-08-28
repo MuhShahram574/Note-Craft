@@ -19,6 +19,7 @@ const aside = document.querySelector("aside");
 // Input Fields
 const newNoteTitle = document.getElementById("title");
 const newNoteDiscription = document.getElementById("description");
+const reminderTimeInput = document.getElementById("reminder-time");
 let searchBar = document.querySelector(".search-bar");
 const noteShowBox = document.querySelector(".note-show-box");
 
@@ -127,6 +128,7 @@ const currentDate = function (need, ISO = Date.now()) {
 let tasks = JSON.parse(getStorage("tasks") || "[]");
 let deletedTasks = JSON.parse(getStorage("deletedTasks") || "[]");
 let achieveTasks = JSON.parse(getStorage("achieveTasks") || "[]");
+let reminderTasks = JSON.parse(getStorage("reminderTasks") || "[]");
 
 // 'notes' | 'trash' | 'achieve' | 'reminder'
 let curContainer = "notes";
@@ -138,6 +140,7 @@ const saveTasks = () => {
   setStorage("tasks", JSON.stringify(tasks));
   setStorage("deletedTasks", JSON.stringify(deletedTasks));
   setStorage("achieveTasks", JSON.stringify(achieveTasks));
+  setStorage("reminderTasks", JSON.stringify(reminderTasks));
 };
 
 /* ------------------- */
@@ -254,7 +257,7 @@ const noteFormAppear = function () {
 const newNoteCancel = function () {
   toggleClasses(addNotesSec, ["hidden"], ["flex"]);
   radioBtns.forEach((btn) => removeClass(btn, COLOR_CLASSES_600));
-  clearFields(newNoteTitle, newNoteDiscription);
+  clearFields(newNoteTitle, newNoteDiscription, reminderTimeInput);
 };
 
 /* ------------------- */
@@ -310,13 +313,21 @@ const setLocalStorageHandler = function () {
       ? fallbackText
       : "blue"; // default safe color
 
+    const reminderTime = reminderTimeInput.value;
+    
     const newTask = {
       id: Date.now(),
       title,
       description,
       bgColor,
       time: currentDate("date"),
+      reminderTime: reminderTime || null,
     };
+    
+    if (reminderTime) {
+      reminderTasks.push({...newTask});
+      scheduleReminder(newTask);
+    }
 
     tasks.push(newTask);
     if (curContainer === "notes") uiUpdate(tasks, "achieveBtn");
@@ -548,12 +559,57 @@ function appperReminderNotes() {
     if (curContainer === "reminder") return;
     fixClass(e);
     curContainer = "reminder";
-    notesContainer.innerHTML = "";
-    noteTitle.textContent = "Reminder Coming Soon...";
+    noteTitle.textContent = "Reminders";
+    createNewNote(reminderTasks, "achieveBtn");
     showMsg("Reminder Notes");
   });
 }
 // End...
+
+/* ------------------- */
+/* REMINDER FUNCTIONS  */
+/* ------------------- */
+const scheduleReminder = (task) => {
+  const reminderTime = new Date(task.reminderTime).getTime();
+  const now = Date.now();
+  const delay = reminderTime - now;
+  
+  if (delay > 0) {
+    setTimeout(() => {
+      showReminderNotification(task);
+      playReminderSound();
+    }, delay);
+  }
+};
+
+const showReminderNotification = (task) => {
+  if (Notification.permission === 'granted') {
+    new Notification(`Reminder: ${task.title}`, {
+      body: task.description,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="%237048e8" d="M224 0c-17.7 0-32 14.3-32 32l0 19.2C119 66 64 130.6 64 208l0 18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416l384 0c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8l0-18.8c0-77.4-55-142-128-156.8L256 32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3l-64 0-64 0c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg>'
+    });
+  }
+  showMsg(`Reminder: ${task.title}`);
+};
+
+const playReminderSound = () => {
+  const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+  audio.play().catch(() => {});
+};
+
+const requestNotificationPermission = () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+};
+
+const loadActiveReminders = () => {
+  reminderTasks.forEach(task => {
+    if (task.reminderTime && new Date(task.reminderTime) > new Date()) {
+      scheduleReminder(task);
+    }
+  });
+};
 
 /* ------------------- */
 /* INIT                */
@@ -570,6 +626,8 @@ function init() {
   appperReminderNotes();
   showTask();
   searchTask();
+  requestNotificationPermission();
+  loadActiveReminders();
 }
 
 // run
