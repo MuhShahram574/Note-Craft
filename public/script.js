@@ -122,6 +122,24 @@ const currentDate = function (need, ISO = Date.now()) {
   }
 };
 
+// return time in HH:MM (24-hour) consistently
+const formatTimeHHMM = (date) => {
+  const d = date instanceof Date ? date : new Date(date);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+};
+
+// normalize time string like '13:5' -> '13:05'
+const normalizeTimeString = (t) => {
+  if (!t) return t;
+  const parts = t.split(":");
+  if (parts.length < 2) return t;
+  const hh = String(Number(parts[0]) || 0).padStart(2, "0");
+  const mm = String(Number(parts[1]) || 0).padStart(2, "0");
+  return `${hh}:${mm}`;
+};
+
 /* ------------------- */
 /* STATE               */
 /* ------------------- */
@@ -219,7 +237,7 @@ const createNewNote = function (arr, btn) {
     </div>
     ${selectSVG(btn)}
     <div class="flex flex-col justify-between gap-1">
-        <p class="text-sm text-gray-700">${item.time}</p>
+        <p class="text-sm text-gray-700">${item.date}</p>
         <h3 class="text-2xl text-gray-900 font-medium">${item.title}</h3>
     </div>
     <p class="text-lg text-gray-800 line-clamp-6 leading-snug">${
@@ -235,9 +253,7 @@ const createNewNote = function (arr, btn) {
 /* UI UPDATE wrapper   */
 /* ------------------- */
 const uiUpdate = (arr, btn) => {
-  // save state first
   saveTasks();
-  // then re-render
   createNewNote(arr, btn);
 };
 
@@ -270,13 +286,11 @@ function radioBtn() {
     const target = e.target.closest(".radio-btn");
     if (!target) return;
 
-    // prefer data-color, fallback to sibling label text
     const textColor = target.nextElementSibling?.textContent
       ?.trim()
       ?.toLowerCase();
     const btnColor = COLOR_KEYS.includes(textColor) ? textColor : null;
 
-    // Clear previous selected color classes
     radioBtns.forEach((btn) => removeClass(btn, COLOR_CLASSES_600));
 
     if (btnColor) {
@@ -285,6 +299,64 @@ function radioBtn() {
       showMsg("Invalid color option");
     }
   });
+}
+
+/* ------------------- */
+/* REMINDER FUNCTIONS  */
+/* ------------------- */
+
+// store active reminder intervals
+let reminderIntervals = {};
+
+const setAlarm1 = function (newtask) {
+  const input = newtask.reminderTime;
+  if (!input) return alert("Please select a time!");
+  // ensure normalized
+  newtask.reminderTime = normalizeTimeString(newtask.reminderTime);
+  // persist
+  if (!reminderTasks.find((t) => t.id === newtask.id)) {
+    reminderTasks.push(newtask);
+    saveTasks();
+  } else {
+    saveTasks();
+  }
+  startReminderCheck(newtask);
+};
+
+function startReminderCheck(task) {
+  // clear if already running
+  if (reminderIntervals[task.id]) {
+    clearInterval(reminderIntervals[task.id]);
+  }
+
+  // use normalized target time
+  const target = normalizeTimeString(task.reminderTime);
+
+  const checkOnce = () => {
+    const now = new Date();
+    const currentTime = formatTimeHHMM(now);
+    // debug
+    // console.log('checking reminder', currentTime, target, task.title);
+    if (currentTime === target) {
+      const audio = new Audio("../public/armo.mp3");
+      audio.play();
+
+      // remove from reminderTasks and persist
+      const idx = reminderTasks.findIndex((t) => t.id === task.id);
+      if (idx !== -1) {
+        reminderTasks.splice(idx, 1);
+        saveTasks();
+      }
+      clearInterval(reminderIntervals[task.id]);
+      delete reminderIntervals[task.id];
+      uiUpdate(reminderTasks);
+    }
+  };
+
+  // run immediate check in case time already matches
+  checkOnce();
+
+  reminderIntervals[task.id] = setInterval(checkOnce, 1000);
 }
 
 /* ------------------- */
@@ -311,31 +383,36 @@ const setLocalStorageHandler = function () {
       ? selectedData
       : COLOR_KEYS.includes(fallbackText)
       ? fallbackText
-      : "blue"; // default safe color
+      : "blue";
 
     const reminderTime = reminderTimeInput.value;
-    
+
     const newTask = {
       id: Date.now(),
       title,
       description,
       bgColor,
-      time: currentDate("date"),
-      reminderTime: reminderTime || null,
+      date: currentDate("date"),
     };
-    
+
     if (reminderTime) {
-      reminderTasks.push({...newTask});
-      scheduleReminder(newTask);
+      newTask.reminderTime = normalizeTimeString(reminderTime);
+      reminderTasks.push(newTask);
+      saveTasks();
+      setAlarm1(newTask);
+    } else {
+      tasks.push(newTask);
+      saveTasks();
     }
 
-    tasks.push(newTask);
     if (curContainer === "notes") uiUpdate(tasks, "achieveBtn");
+    if (curContainer === "achieve") uiUpdate(achieveTasks, "achieveBtn");
+    if (curContainer === "reminder") uiUpdate(reminderTasks, "achieveBtn");
+    if (curContainer === "delete") uiUpdate(deletedTasks, "achieveBtn");
     newNoteCancel();
     showMsg("Note Created");
   });
 };
-// End...
 
 /* ------------------------------------------------------------------------- */
 /* CLICK HANDLING (DELETE / RESTORE / PERMA-DELETE / ACHIEVE / UNACHIEVE) */
@@ -352,7 +429,6 @@ function wireNoteActions() {
 
     const taskId = +taskBox.id;
 
-    // ------------------ NOTES VIEW ------------------ //
     if (curContainer === "notes") {
       if (deleteBtn) {
         const idx = tasks.findIndex((t) => t.id === taskId);
@@ -366,7 +442,6 @@ function wireNoteActions() {
       }
 
       if (achieveBtn) {
-        // Achieve from notes
         const idx = tasks.findIndex((t) => t.id === taskId);
         if (idx !== -1) {
           const removed = tasks.splice(idx, 1)[0];
@@ -378,7 +453,6 @@ function wireNoteActions() {
       }
     }
 
-    // ------------------ TRASH VIEW ------------------ //
     if (curContainer === "trash") {
       if (restoreBtn) {
         const idx = deletedTasks.findIndex((t) => t.id === taskId);
@@ -401,7 +475,6 @@ function wireNoteActions() {
       }
     }
 
-    // ------------------ ACHIEVE VIEW ------------------ //
     if (curContainer === "achieve") {
       if (deleteBtn) {
         const idx = achieveTasks.findIndex((t) => t.id === taskId);
@@ -414,7 +487,6 @@ function wireNoteActions() {
         return;
       }
       if (achieveBtn) {
-        // un-achieve (restore from achieve to notes)
         const idx = achieveTasks.findIndex((t) => t.id === taskId);
         if (idx !== -1) {
           const restored = achieveTasks.splice(idx, 1)[0];
@@ -425,9 +497,24 @@ function wireNoteActions() {
         return;
       }
     }
+
+    if (curContainer === "reminder") {
+      if (deleteBtn) {
+        const idx = reminderTasks.findIndex((t) => t.id === taskId);
+        if (idx !== -1) {
+          reminderTasks.splice(idx, 1);
+          uiUpdate(reminderTasks, "restoreBtn");
+          showMsg("Note Permanently Deleted...");
+          if (reminderIntervals[taskId]) {
+            clearInterval(reminderIntervals[taskId]);
+            delete reminderIntervals[taskId];
+          }
+        }
+        return;
+      }
+    }
   });
 }
-// End...
 
 /* ------------------- */
 /* SEARCH HANDLING     */
@@ -447,7 +534,6 @@ const searchTask = function () {
     });
   });
 };
-// End...
 
 /* ------------------- */
 /* ASIDE HANDLING      */
@@ -459,20 +545,17 @@ const fixClass = function (e) {
   elements.forEach((el) => removeClass(el, "bg-purple-600/30"));
   e.currentTarget.classList.add("bg-purple-600/30");
 };
-// End...
 
 /* ------------------- */
 /* Full Task View      */
 /* ------------------- */
 const showTask = function () {
-  // close on ESC
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !showNoteSec.classList.contains("hidden")) {
       showNoteSec.classList.add("hidden");
     }
   });
 
-  // close on outside click
   document.addEventListener("click", function (e) {
     if (
       !e.target.closest(".task-box") &&
@@ -498,7 +581,6 @@ const showTask = function () {
       const title = showNoteSec.querySelector(".full-note-title");
       const description = showNoteSec.querySelector(".full-note-description");
       const noteBox = showNoteSec.querySelector(".note-show-box");
-      // prepare content
       title.textContent = obj.title;
       description.textContent = obj.description;
       removeClass(noteBox, COLOR_CLASSES_500);
@@ -512,7 +594,6 @@ const showTask = function () {
     viewTask(e);
   });
 };
-// End...
 
 /* ------------------- */
 /* ASIDE NAV HANDLERS  */
@@ -560,75 +641,34 @@ function appperReminderNotes() {
     fixClass(e);
     curContainer = "reminder";
     noteTitle.textContent = "Reminders";
-    createNewNote(reminderTasks, "achieveBtn");
+    createNewNote(reminderTasks, "restoreBtn");
     showMsg("Reminder Notes");
   });
 }
-// End...
 
 /* ------------------- */
-/* REMINDER FUNCTIONS  */
+/* INIT APP            */
 /* ------------------- */
-const scheduleReminder = (task) => {
-  const reminderTime = new Date(task.reminderTime).getTime();
-  const now = Date.now();
-  const delay = reminderTime - now;
-  
-  if (delay > 0) {
-    setTimeout(() => {
-      showReminderNotification(task);
-      playReminderSound();
-    }, delay);
-  }
-};
-
-const showReminderNotification = (task) => {
-  if (Notification.permission === 'granted') {
-    new Notification(`Reminder: ${task.title}`, {
-      body: task.description,
-      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="%237048e8" d="M224 0c-17.7 0-32 14.3-32 32l0 19.2C119 66 64 130.6 64 208l0 18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416l384 0c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8l0-18.8c0-77.4-55-142-128-156.8L256 32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3l-64 0-64 0c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg>'
-    });
-  }
-  showMsg(`Reminder: ${task.title}`);
-};
-
-const playReminderSound = () => {
-  const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-  audio.play().catch(() => {});
-};
-
-const requestNotificationPermission = () => {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-};
-
-const loadActiveReminders = () => {
-  reminderTasks.forEach(task => {
-    if (task.reminderTime && new Date(task.reminderTime) > new Date()) {
-      scheduleReminder(task);
-    }
-  });
-};
-
-/* ------------------- */
-/* INIT                */
-/* ------------------- */
-function init() {
+(function init() {
+  // initial UI
+  createNewNote(tasks, "achieveBtn");
+  // event wires
   noteFormAppear();
   radioBtn();
   setLocalStorageHandler();
-  uiUpdate(tasks, "achieveBtn"); // initial render
-  wireNoteActions(); // one centralized listener
+  wireNoteActions();
+  searchTask();
+  showTask();
   appperNotes();
   appperDeletedNotes();
   appperAchievedNotes();
   appperReminderNotes();
-  showTask();
-  searchTask();
-  requestNotificationPermission();
-  loadActiveReminders();
-}
-
-// run
-init();
+  // re-register reminders from persisted storage
+  if (Array.isArray(reminderTasks) && reminderTasks.length) {
+    reminderTasks.forEach((t) => {
+      // ensure normalized time
+      if (t.reminderTime) t.reminderTime = normalizeTimeString(t.reminderTime);
+      startReminderCheck(t);
+    });
+  }
+})();
