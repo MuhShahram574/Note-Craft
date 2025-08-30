@@ -345,10 +345,10 @@ function startReminderCheck(task) {
       minute: "2-digit",
       hour12: false,
     });
-
-    console.log(currentTime, target);
     if (currentTime === target) {
-      const audio = new Audio("https://shahram-weddev.github.io/armo.mp3 ");
+      const audio = new Audio(
+        "https://shahram-weddev.github.io/Note-Craft/armo.mp3"
+      );
       audio.play();
       showMsg(`${task.title}'s Time!`);
 
