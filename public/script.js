@@ -122,23 +122,34 @@ const currentDate = function (need, ISO = Date.now()) {
   }
 };
 
-// return time in HH:MM (24-hour) consistently
-const formatTimeHHMM = (date) => {
-  const d = date instanceof Date ? date : new Date(date);
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mm}`;
-};
+function normalizeTimeString(time) {
+  if (!time) return null;
 
-// normalize time string like '13:5' -> '13:05'
-const normalizeTimeString = (t) => {
-  if (!t) return t;
-  const parts = t.split(":");
-  if (parts.length < 2) return t;
-  const hh = String(Number(parts[0]) || 0).padStart(2, "0");
-  const mm = String(Number(parts[1]) || 0).padStart(2, "0");
-  return `${hh}:${mm}`;
-};
+  // If a Date is passed
+  if (time instanceof Date) {
+    return time.toLocaleTimeString("default", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // ✅ 12-hour format
+    });
+  }
+
+  // If string like "HH:MM" or "HH:MM:SS"
+  const parts = String(time).split(":");
+  if (parts.length < 2) return String(time);
+
+  let hour = Number(parts[0]);
+  const minute = parts[1].padStart(2, "0");
+
+  // ✅ Convert to 12-hour
+  const ampmHour = hour % 12 || 12;
+
+  // ✅ Always 2-digit hour
+  const formattedHour = String(ampmHour).padStart(2, "0");
+
+  return `${formattedHour}:${minute}`;
+}
+
 
 /* ------------------- */
 /* STATE               */
@@ -306,20 +317,15 @@ function radioBtn() {
 /* ------------------- */
 
 // store active reminder intervals
+
 let reminderIntervals = {};
 
 const setAlarm1 = function (newtask) {
-  const input = newtask.reminderTime;
-  if (!input) return alert("Please select a time!");
-  // ensure normalized
-  newtask.reminderTime = normalizeTimeString(newtask.reminderTime);
-  // persist
-  if (!reminderTasks.find((t) => t.id === newtask.id)) {
-    reminderTasks.push(newtask);
-    saveTasks();
-  } else {
-    saveTasks();
-  }
+  if (!newtask) return;
+  // ensure reminderTime normalized and saved
+  if (newtask.reminderTime)
+    newtask.reminderTime = normalizeTimeString(newtask.reminderTime);
+  // start checking for this reminder
   startReminderCheck(newtask);
 };
 
@@ -334,12 +340,17 @@ function startReminderCheck(task) {
 
   const checkOnce = () => {
     const now = new Date();
-    const currentTime = formatTimeHHMM(now);
-    // debug
-    // console.log('checking reminder', currentTime, target, task.title);
+    const currentTime = now.toLocaleTimeString("default", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    console.log(currentTime, target);
     if (currentTime === target) {
-      const audio = new Audio("../public/armo.mp3");
+      const audio = new Audio("./public/armo.mp3");
       audio.play();
+      showMsg(`${task.title}'s Time!`);
 
       // remove from reminderTasks and persist
       const idx = reminderTasks.findIndex((t) => t.id === task.id);
@@ -406,9 +417,9 @@ const setLocalStorageHandler = function () {
     }
 
     if (curContainer === "notes") uiUpdate(tasks, "achieveBtn");
-    if (curContainer === "achieve") uiUpdate(achieveTasks, "achieveBtn");
-    if (curContainer === "reminder") uiUpdate(reminderTasks, "achieveBtn");
-    if (curContainer === "delete") uiUpdate(deletedTasks, "achieveBtn");
+    if (curContainer === "achieve") uiUpdate(achieveTasks, "unAchieveBtn");
+    if (curContainer === "reminder") uiUpdate(reminderTasks);
+    if (curContainer === "delete") uiUpdate(deletedTasks, "restoreBtn");
     newNoteCancel();
     showMsg("Note Created");
   });
@@ -574,6 +585,7 @@ const showTask = function () {
       if (curContainer === "notes") arr = tasks;
       else if (curContainer === "trash") arr = deletedTasks;
       else if (curContainer === "achieve") arr = achieveTasks;
+      else if (curContainer === "reminder") arr = reminderTasks;
 
       const obj = arr.find((t) => t.id === taskId);
       if (!obj) return;
@@ -641,7 +653,7 @@ function appperReminderNotes() {
     fixClass(e);
     curContainer = "reminder";
     noteTitle.textContent = "Reminders";
-    createNewNote(reminderTasks, "restoreBtn");
+    createNewNote(reminderTasks);
     showMsg("Reminder Notes");
   });
 }
@@ -671,4 +683,5 @@ function appperReminderNotes() {
       startReminderCheck(t);
     });
   }
+  saveTasks();
 })();
