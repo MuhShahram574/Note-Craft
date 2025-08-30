@@ -348,7 +348,7 @@ function startReminderCheck(task) {
 
     console.log(currentTime, target);
     if (currentTime === target) {
-      const audio = new Audio("./public/armo.mp3");
+      const audio = new Audio("../armo.mp3");
       audio.play();
       showMsg(`${task.title}'s Time!`);
 
